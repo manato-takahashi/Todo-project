@@ -3,17 +3,7 @@ import localforage from 'localforage';
 
 // useEffect フックをインポート
 import { useEffect, useState } from 'react';
-
-// "Todo型" の定義
-type Todo = {
-  value: string;
-  readonly id: number;
-  // タスクの完了/未完了を示すプロパティ
-  checked: boolean;
-  removed: boolean;
-};
-
-type Filter = 'all' | 'checked' | 'unchecked' | 'removed';
+import { isTodos } from './lib/isTodo';
 
 export const App = () => {
   // 初期値: 空文字列 ''
@@ -154,7 +144,7 @@ export const App = () => {
   useEffect(() => {
     localforage
       .getItem("todo-20240418")
-      .then((values) => setTodos(values as Todo[]));
+      .then((values) => isTodos(values) && setTodos(values));
   }, []);
 
   // todos ステートが更新されたら、その値を保存
