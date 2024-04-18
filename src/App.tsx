@@ -6,6 +6,7 @@ type Todo = {
   readonly id: number;
   // タスクの完了/未完了を示すプロパティ
   checked: boolean;
+  removed: boolean;
 };
 
 export const App = () => {
@@ -30,6 +31,7 @@ export const App = () => {
       id: new Date().getTime(),
       // 初期値（todo 作成時）は false
       checked: false,
+      removed: false,
     };
 
     /**
@@ -82,6 +84,18 @@ export const App = () => {
     });
   };
 
+  const handleRemove = (id: number, removed: boolean) => {
+    setTodos((todos) => {
+      const newTodos = todos.map((todo) => {
+        if (todo.id === id) {
+          return { ...todo, removed: removed };
+        }
+        return todo;
+      });
+      return newTodos;
+    });
+  };
+
   return (
     <div>
       <form 
@@ -108,16 +122,20 @@ export const App = () => {
             <li key={todo.id}>
               <input
                 type="checkbox"
+                disabled={todo.removed}
                 checked={todo.checked}
                 // 呼び出し側で checked フラグを反転させる
                 onChange={() => handleCheck(todo.id, !todo.checked)}
               />
               <input
                 type="text"
-                disabled={todo.checked}
+                disabled={todo.checked || todo.removed}
                 value={todo.value}
                 onChange={(e) => handleEdit(todo.id, e.target.value)}
               />
+              <button onClick={() => handleRemove(todo.id, !todo.removed)}>
+                {todo.removed ? '復元' : '削除'}
+              </button>
             </li>
           );
         })}
