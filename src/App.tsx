@@ -9,10 +9,13 @@ type Todo = {
   removed: boolean;
 };
 
+type Filter = 'all' | 'checked' | 'unchecked' | 'removed';
+
 export const App = () => {
   // 初期値: 空文字列 ''
   const [text, setText] = useState('');
   const [todos, setTodos] = useState<Todo[]>([]);
+  const [filter, setFilter] = useState<Filter>('all');
 
   // todos ステートを更新する関数
   const handleSubmit = () => {
@@ -96,8 +99,41 @@ export const App = () => {
     });
   };
 
+  const handleSort = (filter: Filter) => {
+    setFilter(filter);
+  };
+
+  const filteredTodos = todos.filter((todo) => {
+    // filter ステートの値に応じて異なる内容の配列を返す
+    switch (filter) {
+      case 'all':
+        // 削除されていないもの
+        return !todo.removed;
+      case 'checked':
+        // 完了済み **かつ** 削除されていないもの
+        return todo.checked && !todo.removed;
+      case 'unchecked':
+        // 未完了 **かつ** 削除されていないもの
+        return !todo.checked && !todo.removed;
+      case 'removed':
+        // 削除済みのもの
+        return todo.removed;
+      default:
+        return todo;
+    }
+  });
+
   return (
     <div>
+      <select 
+        defaultValue="all" 
+        onChange={(e) => handleSort(e.target.value as Filter)}
+      >
+        <option value="all">すべてのタスク</option>
+        <option value="checked">完了したタスク</option>
+        <option value="unchecked">現在のタスク</option>
+        <option value="removed">ごみ箱</option>
+      </select>
       <form 
         onSubmit={(e) => {
           e.preventDefault();
@@ -108,16 +144,18 @@ export const App = () => {
           type="text" 
           // text ステートが持っている入力中のテキストの値を value として表示
           value={text}
+          disabled={filter === 'checked' || filter === 'removed'}
           // onChange イベント （＝入力テキストの変化）を text ステートに反映する
           onChange={(e) => handleChange(e)} />
         <input
           type="submit"
           value="追加"
+          disabled={filter === 'checked' || filter === 'removed'}
           onSubmit={handleSubmit}
         />
       </form>
       <ul>
-        {todos.map((todo) => {
+        {filteredTodos.map((todo) => {
           return (
             <li key={todo.id}>
               <input
