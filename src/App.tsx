@@ -123,6 +123,11 @@ export const App = () => {
     }
   });
 
+  const handleEmpty = () => {
+    // シャロ―コピーで事足りる
+    setTodos((todos) => todos.filter((todo) => !todo.removed));
+  };
+
   return (
     <div>
       <select 
@@ -134,26 +139,37 @@ export const App = () => {
         <option value="unchecked">現在のタスク</option>
         <option value="removed">ごみ箱</option>
       </select>
-      <form 
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSubmit();
-        }}
-      >
-        <input
-          type="text" 
-          // text ステートが持っている入力中のテキストの値を value として表示
-          value={text}
-          disabled={filter === 'checked' || filter === 'removed'}
-          // onChange イベント （＝入力テキストの変化）を text ステートに反映する
-          onChange={(e) => handleChange(e)} />
-        <input
-          type="submit"
-          value="追加"
-          disabled={filter === 'checked' || filter === 'removed'}
-          onSubmit={handleSubmit}
-        />
-      </form>
+      {/* フィルターが removed の時は「ごみ箱を空にする」ボタンを表示 */}
+      {filter === 'removed' ? (
+        <button 
+          onClick={handleEmpty}
+          disabled={todos.filter((todo) => todo.removed).length === 0}
+        >
+          ごみ箱を空にする
+        </button>
+      ) : (
+        // フィルターが checked でなければ Todo 入力フォームを表示
+        filter !== 'checked' && (
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit();
+            }}
+          >
+            <input
+              type="text" 
+              // text ステートが持っている入力中のテキストの値を value として表示
+              value={text}
+              // onChange イベント （＝入力テキストの変化）を text ステートに反映する
+              onChange={(e) => handleChange(e)} />
+            <input
+              type="submit"
+              value="追加"
+              onSubmit={handleSubmit}
+            />
+          </form>
+        )
+      )}
       <ul>
         {filteredTodos.map((todo) => {
           return (
