@@ -4,7 +4,9 @@ import { useState } from "react";
 type Todo = {
   value: string;
   readonly id: number;
-}
+  // タスクの完了/未完了を示すプロパティ
+  checked: boolean;
+};
 
 export const App = () => {
   // 初期値: 空文字列 ''
@@ -26,6 +28,8 @@ export const App = () => {
        * number型の id プロパティの存在が必須になった
        */
       id: new Date().getTime(),
+      // 初期値（todo 作成時）は false
+      checked: false,
     };
 
     /**
@@ -66,6 +70,18 @@ export const App = () => {
     });
   };
 
+  const handleCheck = (id: number, checked: boolean) => {
+    setTodos((todos) => {
+      const newTodos = todos.map((todo) => {
+        if (todo.id === id) {
+          return { ...todo, checked: checked };
+        }
+        return todo;
+      });
+      return newTodos;
+    });
+  };
+
   return (
     <div>
       <form 
@@ -91,9 +107,16 @@ export const App = () => {
           return (
             <li key={todo.id}>
               <input
-              type="text"
-              value={todo.value}
-              onChange={(e) => handleEdit(todo.id, e.target.value)}
+                type="checkbox"
+                checked={todo.checked}
+                // 呼び出し側で checked フラグを反転させる
+                onChange={() => handleCheck(todo.id, !todo.checked)}
+              />
+              <input
+                type="text"
+                disabled={todo.checked}
+                value={todo.value}
+                onChange={(e) => handleEdit(todo.id, e.target.value)}
               />
             </li>
           );
