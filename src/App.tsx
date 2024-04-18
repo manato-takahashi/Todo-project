@@ -1,4 +1,8 @@
-import { useState } from "react";
+// localforage をインポート
+import localforage from 'localforage';
+
+// useEffect フックをインポート
+import { useEffect, useState } from 'react';
 
 // "Todo型" の定義
 type Todo = {
@@ -145,6 +149,18 @@ export const App = () => {
       return newTodos;
     });
   };
+
+  // ページ読み込み時に localStorage からデータを取得
+  useEffect(() => {
+    localforage
+      .getItem("todo-20240418")
+      .then((values) => setTodos(values as Todo[]));
+  }, []);
+
+  // todos ステートが更新されたら、その値を保存
+  useEffect(() => {
+    localforage.setItem("todo-20240418", todos);
+  }, [todos]);
 
   return (
     <div>
