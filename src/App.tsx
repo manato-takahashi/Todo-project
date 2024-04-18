@@ -42,6 +42,30 @@ export const App = () => {
     setText(e.target.value);
   }
 
+  const handleEdit = (id: number, value: string) => {
+    setTodos((todos) => {
+      /**
+       * 引数として渡された todo の id が一致する
+       * 更新前の todos ステート内の todo の
+       * value プロパティを引数 value (= e.target.value) に更新
+       */
+      const newTodos = todos.map((todo) => {
+        if (todo.id === id) {
+          /**
+           * この階層でオブジェクト todo をコピー・展開し、
+           * その中で value プロパティを引数で上書きする
+           * コピーを作って、コピーの方を更新することでイミュータブル（不変）な更新を実現するイメージ
+           */
+          return { ...todo, value: value };
+        }
+        return todo;
+      });
+
+      // todos ステートを更新
+      return newTodos;
+    });
+  };
+
   return (
     <div>
       <form 
@@ -64,7 +88,15 @@ export const App = () => {
       </form>
       <ul>
         {todos.map((todo) => {
-          return <li key={todo.id}>{todo.value}</li>;
+          return (
+            <li key={todo.id}>
+              <input
+              type="text"
+              value={todo.value}
+              onChange={(e) => handleEdit(todo.id, e.target.value)}
+              />
+            </li>
+          );
         })}
       </ul>
     </div>
